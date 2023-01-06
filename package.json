@@ -1,0 +1,22 @@
+{
+  "name": "snake-game",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "this game was made by following Filipe Deschamps tutorial on his first game",
+  "main": "server.js",
+  "watch": {
+    "dev": "/server.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\"  && exit 1",
+    "watch": "npm-watch",
+    "dev": "node server.js"
+  },
+  "author": "Luyz",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "npm-watch": "^0.11.0",
+    "socket.io": "^4.5.4"
+  }
+}
