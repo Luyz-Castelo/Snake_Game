@@ -12,6 +12,9 @@ export default function createKeyboardListener(document) {
     state.observers.push(observerFunction)
   }
 
+  function unsubscribeAll() {
+    state.observers = []
+  }
 
   function notifyAll(command) {
     for (const observerFunction of state.observers) {
@@ -36,6 +39,7 @@ export default function createKeyboardListener(document) {
   
   return {
     subscribe,
+    unsubscribeAll,
     registerPlayerId
   }
 }

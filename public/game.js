@@ -11,13 +11,17 @@ export default function createGame() {
   const observers = []
 
   function start() {
-    const frequency = 2000
+    const frequency = 500 // in ms
 
     setInterval(addFruit, frequency)
   }
 
   function subscribe(observerFunction) {
     observers.push(observerFunction)
+  }
+
+  function unsubscribeAll() {
+    observers.splice(0)
   }
 
   function notifyAll(command) {
@@ -27,13 +31,17 @@ export default function createGame() {
   }
 
   function addPlayer(command) {
-    const playerId = command.playerId        
+    const playerId = command.playerId
     const playerX = 'playerX' in command ? command.playerX : Math.floor(Math.random() * state.screen.width)
     const playerY = 'playerY' in command ? command.playerY : Math.floor(Math.random() * state.screen.height)
+    const playerPoints = 'playerPoints' in command ? command.playerPoints : 0;
+    const playerName = command.playerId.substring(command.playerId.length-4, command.playerId.length)
 
     state.players[playerId] = {
       x: playerX,
       y: playerY,
+      points: playerPoints,
+      name: playerName,
     }
 
     notifyAll({
@@ -41,6 +49,7 @@ export default function createGame() {
       playerId,
       playerX,
       playerY,
+      playerPoints
     })
   }
 
@@ -52,6 +61,22 @@ export default function createGame() {
     notifyAll({
       type: 'remove-player',
       playerId,
+    })
+  }
+
+  function incrementPoint(command) {
+    const playerId = command.playerId
+    
+    const player = state.players[playerId]
+
+    if(player) {
+      player.points += 1
+    }
+
+    notifyAll({
+      type: 'point-incremented',
+      playerId,
+      player
     })
   }
 
@@ -137,6 +162,7 @@ export default function createGame() {
 
       if(player.y === fruit.y && player.x === fruit.x) {
         removeFruit({ fruitId })
+        incrementPoint({ playerId })
       }
     }
   }
@@ -151,5 +177,7 @@ export default function createGame() {
     setState,
     start,
     subscribe,
+    unsubscribeAll,
+    incrementPoint,
   }
 }

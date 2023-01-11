@@ -3,8 +3,7 @@ import http from 'http'
 import createGame from './public/game.js'
 import { Server } from 'socket.io'
 
-const port = 3000
-
+const port = 8000
 const app = express()
 const server = http.createServer(app)
 const sockets = new Server(server)
@@ -22,9 +21,8 @@ sockets.on('connection', socket => {
   const playerId = socket.id
 
   game.addPlayer({ playerId });
-
   socket.emit('setup', game.state)
-
+  sockets.emit('new-player-added', { newPlayer: game.state.players[playerId], newPlayerId: playerId })
   
   socket.on('disconnect', () => {
     game.removePlayer({ playerId })
@@ -33,9 +31,14 @@ sockets.on('connection', socket => {
   socket.on('move-player', command => {
     command.playerId = playerId
     command.type = 'move-player'
-
+    
     game.movePlayer(command)
   })
+
+  socket.on('point-incremented', command => {
+    game.incrementPoint(command)
+  })
+  
 })
 
 server.listen(port, () => {
