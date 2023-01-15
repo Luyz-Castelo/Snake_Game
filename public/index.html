@@ -6,36 +6,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Snake game</title>
 
-  <style>
-    #screen {
-      border: 10px solid #ccc;
-      image-rendering: pixelated;
-      image-rendering: crisp-edges;
-      image-rendering: -moz-crisp-edges;
-      width: 400px;
-      height: 400px;
-    }
-  </style>
+  <link rel="stylesheet" href="./style.css"></link>
   <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
 
-  <div id="enter-game-button" style="display: flex; align-items: center; flex-direction: column;">
+  <div id="color-picker">
     <h1>Change your color</h1>
-    <ul style="display: flex; gap: 1rem; padding: 0">
-      <li style="display: flex;background-color: red; width: 1.875rem; height: 1.875rem;"></li>
-      <li style="display: flex;background-color: blue; width: 1.875rem; height: 1.875rem;"></li>
-      <li style="display: flex;background-color: yellow; width: 1.875rem; height: 1.875rem;"></li>
-      <li style="display: flex;background-color: orange; width: 1.875rem; height: 1.875rem;"></li>
+    <ul id="color-list">
+      <li style="background-color: red;"></li>
+      <li style="background-color: blue;"></li>
+      <li style="background-color: yellow;"></li>
+      <li style="background-color: orange;"></li>
     </ul>
   </div>
 
-  <div id="canvas-div" style="display: flex; justify-content: center;">
+  <div class="centralized-content">
     <canvas id="screen"></canvas>
   </div>
 
-  <div style="display: flex; justify-content: center;">
-    <ul id="scoreboard" style="font-size: 1.5em"></ul>
+  <div class="centralized-content">
+    <ul id="scoreboard"></ul>
+  </div>
+  
+  <div id="mobile-controls">
+    <div>
+      <div><img src="./images/keyboard_key_up.png" id="ArrowUp" class="arrow" alt=""></div>
+    </div>
+    <div style="display: flex">
+      <div><img src="./images/keyboard_key_left.png" id="ArrowLeft" class="arrow" alt=""></div>
+      <div><img src="./images/keyboard_key_down.png" id="ArrowDown" class="arrow" alt=""></div>
+      <div><img src="./images/keyboard_key_right.png" id="ArrowRight" class="arrow" alt=""></div>
+    </div>
   </div>
   
   <script type="module">
@@ -44,10 +46,16 @@
     import createGame from './game.js'
     import createScreenRenderer   from  './render-screen.js'
     import playScoreSoundEffect from './play-score-sound-effect.js'
+    import createMobileListener from './mobile-controls-listener.js'
     import { addPlayerToScoreBoard, removePlayerFromScoreboard, setupScoreboard, updateScoreboard } from './render-scoreboard.js'
+    
+    function playerIsInMobile() {
+      return window.innerWidth < 580
+    }
     
     const game = createGame()
     const keyboardListener = createKeyboardListener(document)
+    const mobileListener = createMobileListener(document)
     
     const socket = io()
     
@@ -74,6 +82,7 @@
     socket.on('disconnect', () => {
       game.unsubscribeAll()
       keyboardListener.unsubscribeAll()
+      mobileListener.unsubscribeAll()
     })
     
     socket.on('setup', state  => {
@@ -92,6 +101,12 @@
       keyboardListener.registerPlayerId(playerId)
       keyboardListener.subscribe(game.movePlayer)
       keyboardListener.subscribe(command => {
+        socket.emit('move-player', command)
+      })
+      
+      mobileListener.registerPlayerId(playerId)
+      mobileListener.subscribe(game.movePlayer)
+      mobileListener.subscribe(command => {
         socket.emit('move-player', command)
       })
 

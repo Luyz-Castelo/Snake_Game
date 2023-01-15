@@ -1,0 +1,60 @@
+#screen {
+  border: 10px solid #ccc;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  image-rendering: -moz-crisp-edges;
+  width: 400px;
+  height: 400px;
+}
+
+#color-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#color-list {
+  display: flex;
+  gap: 1rem;
+  padding: 0;
+}
+
+#color-list > li {
+  display: flex;
+  width: 1.875rem;
+  height: 1.875rem;
+}
+
+#scoreboard {
+  font-size: 1.5em
+}
+
+.centralized-content {
+  display: flex;
+  justify-content: center;
+}
+
+#mobile-controls {
+  display: none;
+}
+
+@media screen and (max-width: 580px) {
+  #screen {
+    border: 5px solid #ccc;
+    width: 300px;
+    height: 300px;
+  }
+
+  #scoreboard {
+    font-size: 1.17em;
+  }
+
+  #mobile-controls {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    font-size: 2em;
+  }
+
+}
