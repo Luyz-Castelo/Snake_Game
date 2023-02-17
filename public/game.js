@@ -1,10 +1,12 @@
+import * as constants from './constants/scale.js';
+
 export default function createGame() {
   const state = {
     players: {},
     fruits: {},
     screen: {
-      width: 10,
-      height: 10,
+      width: 10*constants.scale,
+      height: 10*constants.scale,
     }
   }
 
@@ -31,17 +33,21 @@ export default function createGame() {
   }
 
   function addPlayer(command) {
+    const [randomPosX, randomPosY] = [Math.floor(Math.random() * state.screen.width), Math.floor(Math.random() * state.screen.height)]
+    
     const playerId = command.playerId
-    const playerX = 'playerX' in command ? command.playerX : Math.floor(Math.random() * state.screen.width)
-    const playerY = 'playerY' in command ? command.playerY : Math.floor(Math.random() * state.screen.height)
+    const playerX = 'playerX' in command ? command.playerX : randomPosX - (randomPosX%constants.scale)
+    const playerY = 'playerY' in command ? command.playerY : randomPosY - (randomPosY%constants.scale)
     const playerPoints = 'playerPoints' in command ? command.playerPoints : 0;
     const playerName = command.playerId.substring(command.playerId.length-4, command.playerId.length)
+    const playerDirection = 'direction' in command ? command.direction : 'right'
 
     state.players[playerId] = {
       x: playerX,
       y: playerY,
       points: playerPoints,
       name: playerName,
+      direction: playerDirection,
     }
 
     notifyAll({
@@ -49,7 +55,8 @@ export default function createGame() {
       playerId,
       playerX,
       playerY,
-      playerPoints
+      playerPoints,
+      playerDirection,
     })
   }
 
@@ -81,9 +88,11 @@ export default function createGame() {
   }
 
   function addFruit(command) {
+    const [randomPosX, randomPosY] = [Math.floor(Math.random() * state.screen.width), Math.floor(Math.random() * state.screen.height)]
+
     const fruitId = command ? command.fruitId : Math.floor(Math.random() * 100000)
-    const fruitX = command ? command.fruitX : Math.floor(Math.random() * state.screen.width)
-    const fruitY = command ? command.fruitY : Math.floor(Math.random() * state.screen.height)
+    const fruitX = command ? command.fruitX : randomPosX - (randomPosX%constants.scale)
+    const fruitY = command ? command.fruitY : randomPosY - (randomPosY%constants.scale)
 
     state.fruits[fruitId] = {
       x: fruitX,
@@ -114,26 +123,30 @@ export default function createGame() {
 
     const acceptedMoves = {
       ArrowUp(player) {
-        if(player.y - 1 >= 0) {
-          player.y -= 1
+        if(player.y - 1*constants.scale >= 0) {
+          player.y -= 1*constants.scale
+          player.direction = 'up'
           return
         }
       },
       ArrowDown(player) {
-        if(player.y + 1 < state.screen.height) {
-          player.y += 1
+        if(player.y + 1*constants.scale < state.screen.height) {
+          player.y += 1*constants.scale
+          player.direction = 'down'
           return
         }
       },
       ArrowRight(player) {
-        if(player.x + 1 < state.screen.width) {
-          player.x += 1
+        if(player.x + 1*constants.scale < state.screen.width) {
+          player.x += 1*constants.scale
+          player.direction = 'right'
           return
         }
       },
       ArrowLeft(player) {
-        if(player.x -1 >= 0) {
-          player.x -= 1
+        if(player.x -1*constants.scale >= 0) {
+          player.x -= 1*constants.scale
+          player.direction = 'left'
           return
         }
       },
